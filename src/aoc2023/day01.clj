@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 
-(def input (str/split-lines (slurp (io/resource "day01_1.txt"))))
+(def input (str/split-lines (slurp (io/resource "day01.txt"))))
 
 (defn decode-calibration
   [message]
