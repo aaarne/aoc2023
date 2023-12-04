@@ -55,3 +55,23 @@
     (read-string (:group candidate))))
 
 (reduce + (part1 data)) ;; Solution Part 1
+
+(defn find-numbers-adjacent-to-pos
+  [data i j]
+  (defn find-in-line
+    [line]
+    (->> (re-seq-pos #"\d+" (nth data line))
+         (filter #(>= j (- (:start %) 1)))
+         (filter #(< j (+ (:end %) 1)))
+         (map #(read-string (:group %)))))
+  (let [above (max (- i 1) 0)
+        below (min (+ i 1) (- (count data) 1))]
+    (mapcat find-in-line [above i below])))
+
+
+
+(for [[i line] (map vector (range) test-data)
+      starmatches (re-seq-pos #"\*" line)]
+  (list i starmatches (count (find-numbers-adjacent-to-pos test-data i (:start starmatches)))))
+
+(find-numbers-adjacent-to-pos test-data 1 3)
