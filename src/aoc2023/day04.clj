@@ -16,60 +16,53 @@
   (defn parse-numbers
     [space-seperated]
     (map read-string (remove empty? (str/split space-seperated #" "))))
-  (let [s (str/split s #": ")]
-    (let [id (read-string (re-find #"\d+" (first s)))
-          [winning have] (str/split (second s) #"\|")]
-      {:id id
-       :winning (set (parse-numbers winning))
-       :have (parse-numbers have)})))
+  (let [s (str/split s #": ")
+        id (read-string (re-find #"\d+" (first s)))
+        [winning have] (str/split (second s) #"\|")]
+    {:id id
+     :winning (set (parse-numbers winning))
+     :have (parse-numbers have)}))
 
 (defn count-matches
   [card]
   (let [winning (:winning card)
-        have (:have card)
-        amount (->> have
-                    (filter winning)
-                    (count))]
-    amount))
+        have (:have card)]
+    (->> have
+         (filter winning)
+         (count))))
 
 (defn evaluate-card
   [card]
   (let [amount (count-matches card)]
-    (cond 
+    (cond
       (= amount 0) 0
       (= amount 1) 1
       :else (reduce * (take (- amount 1) (repeat 2))))))
 
-
-(evaluate-card (read-card (first test-data)))
-
-(->> data
-     (map read-card)
-     (map evaluate-card)
-     (reduce +))
-
+(def part1
+  (->> data
+       (map read-card)
+       (map evaluate-card)
+       (reduce +))) ;; Solution 1
 
 (defn read-card-map
   [data]
-  (let [cards (map read-card data)]
-    (into {} (map #(vector (:id %) %) cards))))
-
-(read-card-map test-data)
+  (into {} (map #(vector (:id %) %) (map read-card data))))
 
 (defn process-part2
   [data]
   (let [cardmap (read-card-map data)]
-    (loop [todo (vals cardmap)
+    (loop [todo (map :id (vals cardmap))
            result nil]
       (if (empty? todo)
         result
-        (let [card (first todo)
+        (let [card (cardmap (first todo))
               id (:id card)
               matches (count-matches card)
               newcards (if (= matches 0)
                          nil
                          (map #(+ 1 id %) (range matches)))]
-          (recur (concat (map cardmap newcards) (rest todo))
+          (recur (concat newcards (rest todo))
                  (conj result id)))))))
-         
-(process-part2 test-data)
+
+(def part2 (count (process-part2 data))) ;; Solution 2
