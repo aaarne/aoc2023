@@ -1,6 +1,7 @@
 (ns aoc2023.day03
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str])
+  (:use [aoc2023.core]))
 
 (def test-data
   ["467..114.."
@@ -15,13 +16,6 @@
    ".664.598.."])
 
 (def data (str/split-lines (slurp (io/resource "day03.txt"))))
-
-(defn re-seq-pos [pattern string]
-  (let [m (re-matcher pattern string)]
-    ((fn step []
-       (when (. m find)
-         (cons {:start (. m start) :end (. m end) :group (. m group)}
-               (lazy-seq (step))))))))
 
 (def symbols
   (->> (apply str data)
@@ -68,10 +62,19 @@
         below (min (+ i 1) (- (count data) 1))]
     (mapcat find-in-line [above i below])))
 
+(defn part2
+  [data]
+  (let [candidates (for [[i line] (map vector (range) data)
+                         starmatches (re-seq-pos #"\*" line)]
+                      (list i (:start starmatches)))]
+    (->> candidates
+         (map (fn [[i j]] (find-numbers-adjacent-to-pos data i j)))
+         (filter #(= 2 (count %)))
+         (map #(reduce * %))
+         (reduce +))))
+         
+
+(part2 test-data)
+(part2 data)
 
 
-(for [[i line] (map vector (range) test-data)
-      starmatches (re-seq-pos #"\*" line)]
-  (list i starmatches (count (find-numbers-adjacent-to-pos test-data i (:start starmatches)))))
-
-(find-numbers-adjacent-to-pos test-data 1 3)
