@@ -17,19 +17,16 @@
     [space-seperated]
     (map read-string (remove empty? (str/split space-seperated #" "))))
   (let [s (str/split s #": ")
-        id (read-string (re-find #"\d+" (first s)))
         [winning have] (str/split (second s) #"\|")]
-    {:id id
+    {:id (read-string (re-find #"\d+" (first s)))
      :winning (set (parse-numbers winning))
      :have (parse-numbers have)}))
 
 (defn count-matches
   [card]
-  (let [winning (:winning card)
-        have (:have card)]
-    (->> have
-         (filter winning)
-         (count))))
+  (->> (:have card)
+       (filter (:winning card))
+       (count)))
 
 (defn evaluate-card
   [card]
@@ -52,7 +49,7 @@
 (defn process-part2
   [data]
   (let [cardmap (read-card-map data)]
-    (loop [todo (map :id (vals cardmap))
+    (loop [todo (keys cardmap)
            result nil]
       (if (empty? todo)
         result
