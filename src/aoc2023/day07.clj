@@ -22,7 +22,7 @@
    (->> hand
         (map cs)
         (map vector [4 3 2 1 0])
-        (map (fn [pair] (* (second pair) (int (math/pow base (first pair))))))
+        (map #(let [[e b] %] (* b (int (math/pow base e)))))
         (reduce +)))
   ([hand] (hand->number hand card->strength)))
 
@@ -75,7 +75,7 @@
 
 
 ;; Solution Part 1
-(->> (str/split-lines (slurp (io/resource "day07.txt")))
+(->> testdata ;(str/split-lines (slurp (io/resource "day07.txt")))
      parse
      (map #(assoc % :type (evaluate-hand (:hand %))))
      (map #(assoc % :num (hand->number (:hand %))))
