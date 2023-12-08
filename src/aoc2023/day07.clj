@@ -98,7 +98,8 @@
         (fingerprint->type (cons (+ njokers head) rest))))))
 
 ;; Solution Part 2
-(->> (str/split-lines (slurp (io/resource "day07.txt")))
+(->> 
+     (str/split-lines (slurp (io/resource "day07.txt")))
      parse
      (map #(assoc % :type (evaluate-hand-part2 (:hand %))))
      (map #(assoc % :num (hand->number (:hand %) card2->strength)))
